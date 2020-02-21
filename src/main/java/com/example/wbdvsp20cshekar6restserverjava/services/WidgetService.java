@@ -3,6 +3,8 @@ package com.example.wbdvsp20cshekar6restserverjava.services;
 import com.example.wbdvsp20cshekar6restserverjava.models.Widget;
 
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -81,30 +83,33 @@ public class WidgetService {
   }
 
   public List<Widget> findWidgetsForTopic(String tid, String wid, int direction) {
-    List<Widget> results = new ArrayList<>();
-    for (Widget w : widgetList) {
-      if (w.getTopicId().equals(tid)) {
-        results.add(w);
+    List<Integer> results = new ArrayList<>();
+    int pos=0;
+    int prev=0;
+    int next=0;
+    boolean done = false;
+    for (int i = 0; i < widgetList.size(); i++) {
+      if (widgetList.get(i).getTopicId().equals(tid)) {
+          if(widgetList.get(i).getId().equals(wid)) {
+            prev = results.get(results.size()-1);
+            results.add(i);
+           pos = i;
+           done = true;
+          } else {
+            if (done) {
+              next = i;
+              done = false;
+            }
+            results.add(i);
+          }
       }
     }
-    for (int i = 0; i < results.size(); i++) {
-      if(results.get(i).getId().equals(wid)) {
-        if (direction == 1) {
-          int pos = i - 1;
-          Widget temp = results.get(pos);
-          results.remove(pos);
-          results.add(i,temp);
-          break;
-        } else if (direction == 2) {
-          int pos = i+1;
-          Widget temp = results.get(i);
-          results.remove(i);
-          results.add(pos,temp);
-          break;
-        }
-      }
-  }
-    return results;
+    if (direction == 1) {
+      Collections.swap(widgetList,prev,pos);
+    } else {
+      Collections.swap(widgetList,next,pos);
+    }
+    return findWidgetsForTopic(tid);
   }
 
 }
