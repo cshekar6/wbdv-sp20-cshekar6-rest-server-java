@@ -79,4 +79,32 @@ public class WidgetService {
     }
     return 0;
   }
+
+  public List<Widget> findWidgetsForTopic(String tid, String wid, int direction) {
+    List<Widget> results = new ArrayList<>();
+    for (Widget w : widgetList) {
+      if (w.getTopicId().equals(tid)) {
+        results.add(w);
+      }
+    }
+    for (int i = 0; i < results.size(); i++) {
+      if(results.get(i).getId().equals(wid)) {
+        if (direction == 1) {
+          int pos = i - 1;
+          Widget temp = results.get(pos);
+          results.remove(pos);
+          results.add(i,temp);
+          break;
+        } else if (direction == 2) {
+          int pos = i+1;
+          Widget temp = results.get(i);
+          results.remove(i);
+          results.add(pos,temp);
+          break;
+        }
+      }
+  }
+    return results;
+  }
+
 }

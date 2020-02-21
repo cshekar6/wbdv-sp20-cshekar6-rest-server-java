@@ -33,6 +33,13 @@ public class WidgetController {
     return service.findWidgetsForTopic(tid);
   }
 
+  @GetMapping("/api/topics/{tid}/widgets/{wid}/{direction}")
+  public List<Widget> findWidgetsForTopic(@PathVariable("tid")  String tid,
+                                          @PathVariable("wid") String wid,
+                                          @PathVariable("direction") int direction) {
+    return service.findWidgetsForTopic(tid,wid,direction);
+  }
+
   @PutMapping("/api/widgets/{wid}")
   public int updateWidget(@PathVariable("wid") String wid, @RequestBody  Widget widget) {
      return service.updateWidget(wid,widget);
