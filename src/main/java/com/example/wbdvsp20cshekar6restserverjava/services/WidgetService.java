@@ -91,7 +91,9 @@ public class WidgetService {
     for (int i = 0; i < widgetList.size(); i++) {
       if (widgetList.get(i).getTopicId().equals(tid)) {
           if(widgetList.get(i).getId().equals(wid)) {
-            prev = results.get(results.size()-1);
+            if (!results.isEmpty()) {
+              prev = results.get(results.size() - 1);
+            }
             results.add(i);
            pos = i;
            done = true;
