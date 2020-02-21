@@ -36,6 +36,7 @@ public class WidgetService {
   public Widget createWidget(String topicId,
           Widget newWidget) {
     newWidget.setTopicId(topicId);
+    newWidget.setTitle(newWidget.getTitle());
     widgetList.add(newWidget);
     return newWidget;
   }
