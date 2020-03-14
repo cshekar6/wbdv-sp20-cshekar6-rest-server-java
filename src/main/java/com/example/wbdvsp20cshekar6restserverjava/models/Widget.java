@@ -1,26 +1,41 @@
 package com.example.wbdvsp20cshekar6restserverjava.models;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.ManyToOne;
+import javax.persistence.Table;
+
 /**
  * @author cshekar6
  */
+@Entity
+@Table(name="widgets")
 public class Widget {
   private String name;
-  private String id;
+  @Id
+  @GeneratedValue(strategy = GenerationType.IDENTITY)
+  private Integer id;
   private String type = "HEADING";
-  private int order;
-  private String text;
-  private String url;
-  private int size;
-  private int width;
-  private int height;
   private String cssClass;
   private String style;
   private String value;
-
   private String title;
-  private String topicId;
+  private String text;
+  private String url;
+  @ManyToOne
+  @JsonIgnore
+  private Topic topic;
+  private int widgetOrder;
+  private int size = 0;
+  private int width = 0;
+  private int height = 0;
 
-  public Widget(String id,String type) {
+
+  public Widget(Integer id,String type) {
     this.id = id;
     this.type = type;
   }
@@ -36,11 +51,11 @@ public class Widget {
     this.name = name;
   }
 
-  public String getId() {
+  public Integer getId() {
     return id;
   }
 
-  public void setId(String id) {
+  public void setId(Integer id) {
     this.id = id;
   }
 
@@ -52,12 +67,12 @@ public class Widget {
     this.type = type;
   }
 
-  public int getOrder() {
-    return order;
+  public int getWidgetOrder() {
+    return widgetOrder;
   }
 
-  public void setOrder(int order) {
-    this.order = order;
+  public void setWidgetOrder(int order) {
+    this.widgetOrder = order;
   }
 
   public String getText() {
@@ -132,12 +147,12 @@ public class Widget {
     this.title = title;
   }
 
-  public String getTopicId() {
-    return topicId;
+  public Topic getTopic() {
+    return topic;
   }
 
-  public void setTopicId(String topicId) {
-    this.topicId = topicId;
+  public void setTopic(Topic topic) {
+    this.topic = topic;
   }
 
 }

@@ -1,116 +1,74 @@
 package com.example.wbdvsp20cshekar6restserverjava.services;
 
+import com.example.wbdvsp20cshekar6restserverjava.models.Topic;
 import com.example.wbdvsp20cshekar6restserverjava.models.Widget;
+import com.example.wbdvsp20cshekar6restserverjava.repositories.TopicRepository;
+import com.example.wbdvsp20cshekar6restserverjava.repositories.WidgetRepository;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
 import java.util.List;
-import java.util.stream.Collectors;
 
 /**
  * @author cshekar6
  */
+@Service
 public class WidgetService {
-  List<Widget> widgetList = new ArrayList();
 
-  {
-    Widget w1 = new Widget("123", "HEADING");
-    Widget w2 = new Widget("234", "PARAGRAPH");
-    Widget w3 = new Widget("345", "HEADING");
-    Widget w4 = new Widget("456",  "PARAGRAPH");
-    Widget w5 = new Widget("567", "HEADING");
+  @Autowired
+  WidgetRepository widgetRepository;
 
-    w1.setTopicId("111");
-    w2.setTopicId("111");
+  @Autowired
+  TopicRepository topicRepository;
 
-    w3.setTopicId("222");
-    w4.setTopicId("222");
-    w5.setTopicId("222");
-
-    widgetList.add(w1);
-    widgetList.add(w2);
-    widgetList.add(w3);
-    widgetList.add(w4);
-    widgetList.add(w5);
+  public Widget createWidget(Integer topicId, Widget newWidget) {
+    Topic topic = topicRepository.findById(topicId).get();
+    newWidget.setTopic(topic);
+    int size = findAllWidgets().size();
+    newWidget.setWidgetOrder(size);
+    return widgetRepository.save(newWidget);
   }
 
-  public Widget createWidget(String topicId,
-          Widget newWidget) {
-    newWidget.setTopicId(topicId);
-    newWidget.setTitle(newWidget.getTitle());
-    widgetList.add(newWidget);
-    return newWidget;
-  }
-
-  public Widget findWidgetById(String wid) {
-    for(Widget w: widgetList) {
-      if(w.getId().equals(wid)) {
-        return w;
-      }
-    }
-    return null;
+  public Widget findWidgetById(Integer wid) {
+      return widgetRepository.findById(wid).get();
   }
 
   public List<Widget> findAllWidgets() {
-    return widgetList;
+    return (List<Widget>) widgetRepository.findAll();
   }
 
-  public List<Widget> findWidgetsForTopic(String topicId) {
-    List<Widget> results = new ArrayList<>();
-    for(Widget w: widgetList) {
-      if(w.getTopicId().equals(topicId)) {
-        results.add(w);
+  public List<Widget> findWidgetsForTopic(Integer topicId) {
+   return widgetRepository.findWidgetsForTopic(topicId);
+  }
+
+  public int deleteWidget(Integer wid) {
+    Widget t = widgetRepository.findById(wid).get();
+    int order = t.getWidgetOrder();
+    findAllWidgets().stream().forEach(widget -> {
+      if(widget.getWidgetOrder() > order) {
+        widget.setWidgetOrder(widget.getWidgetOrder() - 1);
+        widgetRepository.save(widget);
       }
-    }
-    return results;
-  }
-
-  public int deleteWidget(String wid) {
-    widgetList = widgetList.stream()
-            .filter(w -> !w.getId().equals(wid)).collect(Collectors.toList());
+    });
+    widgetRepository.deleteById(wid);
     return 1;
   }
 
-  public int updateWidget(String wid, Widget updatedWidget) {
-    for(int i=0; i<widgetList.size(); i++) {
-      if(widgetList.get(i).getId().equals(wid)) {
-        widgetList.set(i, updatedWidget);
-        return 1;
-      }
-    }
-    return 0;
+  public int updateWidget(Integer wid, Widget updatedWidget) {
+    Widget t = widgetRepository.findById(wid).get();
+    t.setTitle(updatedWidget.getTitle());
+    t.setName(updatedWidget.getName());
+    t.setSize(updatedWidget.getSize());
+    t.setText(updatedWidget.getText());
+    t.setType(updatedWidget.getType());
+    t.setStyle(updatedWidget.getStyle());
+    t.setUrl(updatedWidget.getUrl());
+    widgetRepository.save(t);
+    return 1;
   }
 
-  public List<Widget> findWidgetsForTopic(String tid, String wid, int direction) {
-    List<Integer> results = new ArrayList<>();
-    int pos=0;
-    int prev=0;
-    int next=0;
-    boolean done = false;
-    for (int i = 0; i < widgetList.size(); i++) {
-      if (widgetList.get(i).getTopicId().equals(tid)) {
-          if(widgetList.get(i).getId().equals(wid)) {
-            if (!results.isEmpty()) {
-              prev = results.get(results.size() - 1);
-            }
-            results.add(i);
-           pos = i;
-           done = true;
-          } else {
-            if (done) {
-              next = i;
-              done = false;
-            }
-            results.add(i);
-          }
-      }
-    }
-    if (direction == 1) {
-      Collections.swap(widgetList,prev,pos);
-    } else {
-      Collections.swap(widgetList,next,pos);
-    }
+  public List<Widget> findWidgetsForTopic(Integer tid, Integer wid, int direction) {
     return findWidgetsForTopic(tid);
   }
 
