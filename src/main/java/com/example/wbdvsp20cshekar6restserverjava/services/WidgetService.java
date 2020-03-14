@@ -8,7 +8,10 @@ import com.example.wbdvsp20cshekar6restserverjava.repositories.WidgetRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.Collection;
+import java.util.Comparator;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * @author cshekar6
@@ -39,7 +42,9 @@ public class WidgetService {
   }
 
   public List<Widget> findWidgetsForTopic(Integer topicId) {
-   return widgetRepository.findWidgetsForTopic(topicId);
+    return widgetRepository.findWidgetsForTopic(topicId).stream()
+    .sorted(Comparator.comparing(Widget::getWidgetOrder))
+    .collect(Collectors.toList());
   }
 
   public int deleteWidget(Integer wid) {
@@ -69,6 +74,24 @@ public class WidgetService {
   }
 
   public List<Widget> findWidgetsForTopic(Integer tid, Integer wid, int direction) {
+    List<Widget> widgets = findWidgetsForTopic(tid);
+    for(int i=0; i<widgets.size();i++) {
+      int currentOrder = widgets.get(i).getWidgetOrder();
+      int widgetId = widgets.get(i).getId();
+      if(widgetId == wid) {
+        if(direction ==1) {
+          widgets.get(i).setWidgetOrder(widgets.get(i-1).getWidgetOrder());
+          widgets.get(i-1).setWidgetOrder(currentOrder);
+          widgetRepository.save(widgets.get(i-1));
+        } else if (direction ==2) {
+          widgets.get(i).setWidgetOrder(widgets.get(i+1).getWidgetOrder());
+          widgets.get(i+1).setWidgetOrder(currentOrder);
+          widgetRepository.save(widgets.get(i+1));
+        }
+        widgetRepository.save(widgets.get(i));
+        break;
+      }
+    }
     return findWidgetsForTopic(tid);
   }
 
